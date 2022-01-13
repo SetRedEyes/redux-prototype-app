@@ -1,11 +1,70 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
+//Reducer
+function taskReducer(state, action) {
+  switch (action.type) {
+    case 'task/completed':
+      const newArray = [...state]
+      const elementIndex = newArray.findIndex(
+        (el) => el.id === action.payload.id
+      )
+      newArray[elementIndex].completed = true
+      return newArray
+    default:
+      return state
+  }
+}
+
+//createStore
+function createStore(reducer, initialState) {
+  let state = initialState
+
+  function getState() {
+    return state
+  }
+
+  function dispatch(action) {
+    state = reducer(state, action)
+  }
+
+  return { getState, dispatch }
+}
+
+//initializeStore
+const store = createStore(taskReducer, [
+  { id: 1, description: 'Task1', completed: false },
+  { id: 2, description: 'Task2', completed: false }
+])
+
 const App = () => {
-  const [state, setState] = useState({})
-  // setState((prevState) => ({ ...prevState, id: '123' }))
-  console.log(state)
-  return <h1>App</h1>
+  const state = store.getState()
+
+  const completedTask = (taskId) => {
+    store.dispatch({
+      type: 'task/completed',
+      payload: { id: taskId }
+    })
+    console.log(store.getState())
+  }
+  return (
+    <>
+      <h1>App</h1>
+
+      <ul>
+        {state.map((el) => (
+          <li key={el.id}>
+            <p>{el.description}</p>
+            <p>{`Completed: ${el.completed}`}</p>
+            <button onClick={() => completedTask(el.id)}>
+              Complete
+            </button>
+            <hr />
+          </li>
+        ))}
+      </ul>
+    </>
+  )
 }
 
 ReactDOM.render(
