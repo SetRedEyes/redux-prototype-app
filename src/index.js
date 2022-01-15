@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
-import * as actions from './store/actions'
-import { initiateStore } from './store/store'
+import {
+  taskCompleted,
+  titleChanged,
+  taskDeleted
+} from './store/task'
+import configureStore from './store/store'
 
 //initializeStore
-const store = initiateStore()
+const store = configureStore()
 
 const App = () => {
   const [state, setState] = useState(store.getState())
@@ -17,15 +21,15 @@ const App = () => {
   )
 
   const completedTask = (taskId) => {
-    store.dispatch(actions.taskCompleted(taskId))
+    store.dispatch(taskCompleted(taskId))
   }
 
   const changeTitle = (taskId) => {
-    store.dispatch(actions.titleChanged(taskId))
+    store.dispatch(titleChanged(taskId))
   }
 
   const deleteTask = (taskId) => {
-    store.dispatch(actions.taskDeleted(taskId))
+    store.dispatch(taskDeleted(taskId))
   }
   return (
     <>
