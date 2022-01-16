@@ -38,10 +38,12 @@ const taskSlice = createSlice({
 const { actions, reducer: taskReducer } = taskSlice
 const { update, remove } = actions
 
-//actions
-export function taskCompleted(id) {
-  return update({ id, completed: true })
-}
+//actions with thunk
+
+export const completeTask =
+  (id) => (dispatch, getState) => {
+    dispatch(update({ id, completed: true }))
+  }
 
 export function titleChanged(id) {
   return update({
