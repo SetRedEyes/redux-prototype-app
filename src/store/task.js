@@ -1,23 +1,16 @@
-import {
-  // createAction,
-  // createReducer,
-  createSlice
-} from '@reduxjs/toolkit'
+import { createAction, createSlice } from '@reduxjs/toolkit'
+import todosService from '../services/todos.service'
 
-const initialState = [
-  { id: 1, title: 'Task1', completed: false },
-  { id: 2, title: 'Task2', completed: false }
-]
-
-//actionTypes
-// const update = createAction('task/updated')
-// const remove = createAction('task/removed')
+const initialState = { entities: [], isLoading: true }
 
 //createSlice
 const taskSlice = createSlice({
   name: 'task',
   initialState,
   reducers: {
+    recieved(state, action) {
+      return action.payload
+    },
     update(state, action) {
       const elementIndex = state.findIndex(
         (el) => el.id === action.payload.id
@@ -35,9 +28,22 @@ const taskSlice = createSlice({
   }
 })
 
+//actionTypes
 const { actions, reducer: taskReducer } = taskSlice
-const { update, remove } = actions
+const { update, remove, recieved } = actions
 
+const taskRequested = createAction('task/requested')
+const taskRequestFailed = createAction('task/requestFailed')
+
+export const getTasks = () => async (dispatch) => {
+  dispatch(taskRequested())
+  try {
+    const data = await todosService.fetch()
+    dispatch(recieved(data))
+  } catch (error) {
+    dispatch(taskRequestFailed(error.message))
+  }
+}
 //actions with thunk
 
 export const completeTask =
@@ -56,25 +62,5 @@ export function taskDeleted(id) {
   return remove({ id })
 }
 
-//Reducer
-// const taskReducer = createReducer(
-//   initialState,
-//   (builder) => {
-//     builder
-//       .addCase(update, (state, action) => {
-//         const elementIndex = state.findIndex(
-//           (el) => el.id === action.payload.id
-//         )
-//         state[elementIndex] = {
-//           ...state[elementIndex],
-//           ...action.payload
-//         }
-//       })
-//       .addCase(remove, (state, action) => {
-//         return state.filter(
-//           (el) => el.id !== action.payload.id
-//         )
-//       })
-//   }
-// )
+
 export default taskReducer

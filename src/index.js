@@ -3,29 +3,33 @@ import ReactDOM from 'react-dom'
 import {
   titleChanged,
   taskDeleted,
-  completeTask
+  completeTask,
+  getTasks
 } from './store/task'
 import initializeStore from './store/store'
+import {
+  Provider,
+  useSelector,
+  useDispatch
+} from 'react-redux'
 
 //initializeStore
 const store = initializeStore()
 
 const App = () => {
-  const [state, setState] = useState(store.getState())
-  useEffect(
-    () =>
-      store.subscribe(() => {
-        setState(store.getState())
-      }),
-    []
-  )
+  const state = useSelector((state) => state)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(getTasks())
+  }, [])
 
   const changeTitle = (taskId) => {
-    store.dispatch(titleChanged(taskId))
+    dispatch(titleChanged(taskId))
   }
 
   const deleteTask = (taskId) => {
-    store.dispatch(taskDeleted(taskId))
+    dispatch(taskDeleted(taskId))
   }
   return (
     <>
@@ -37,9 +41,7 @@ const App = () => {
             <p>{el.title}</p>
             <p>{`Completed: ${el.completed}`}</p>
             <button
-              onClick={() =>
-                store.dispatch(completeTask(el.id))
-              }
+              onClick={() => dispatch(completeTask(el.id))}
             >
               Complete
             </button>
@@ -61,7 +63,9 @@ const App = () => {
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 )
