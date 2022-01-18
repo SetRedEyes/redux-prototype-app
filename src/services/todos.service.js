@@ -9,6 +9,16 @@ const todosService = {
         _limit: 10
       }
     })
+    console.log(data)
+    return data
+  },
+  create: async (title, completed) => {
+    const { data } = await httpService.post(
+      todosEndpoint,
+      title,
+      completed
+    )
+
     return data
   }
 }

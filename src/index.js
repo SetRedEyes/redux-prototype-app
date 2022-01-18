@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import {
   titleChanged,
   taskDeleted,
   completeTask,
-  getTasks
+  loadTasks,
+  getTasks,
+  getTasksLoadingStatus,
+  createTask
 } from './store/task'
 import initializeStore from './store/store'
 import {
@@ -12,16 +15,20 @@ import {
   useSelector,
   useDispatch
 } from 'react-redux'
+import { getError } from './store/errors'
 
 //initializeStore
 const store = initializeStore()
 
 const App = () => {
-  const state = useSelector((state) => state)
+  const state = useSelector(getTasks())
+  const isLoading = useSelector(getTasksLoadingStatus())
+  const error = useSelector(getError())
+
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(getTasks())
+    dispatch(loadTasks())
   }, [])
 
   const changeTitle = (taskId) => {
@@ -31,11 +38,25 @@ const App = () => {
   const deleteTask = (taskId) => {
     dispatch(taskDeleted(taskId))
   }
+  if (isLoading) {
+    return <h1>Loading...</h1>
+  }
+  if (error) {
+    return <p>{error}</p>
+  }
+
   return (
     <>
       <h1>App</h1>
 
       <ul>
+        <button
+          onClick={() =>
+            dispatch(createTask('NEW TASK', false))
+          }
+        >
+          Add task
+        </button>
         {state.map((el) => (
           <li key={el.id}>
             <p>{el.title}</p>
