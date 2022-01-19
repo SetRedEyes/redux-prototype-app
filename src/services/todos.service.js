@@ -12,13 +12,11 @@ const todosService = {
     console.log(data)
     return data
   },
-  create: async (title, completed) => {
+  create: async (payload) => {
     const { data } = await httpService.post(
       todosEndpoint,
-      title,
-      completed
+      payload
     )
-
     return data
   }
 }
